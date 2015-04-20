@@ -1,0 +1,5 @@
+*.pdf
+data/
+test_data/
+*.zip
+*.csv
