@@ -449,6 +449,80 @@ performs OLS regression of y on three predictors. The coefficient var-covar matr
 SURVIVAL AND EVENT-COUNT MODELS
 #################################################
 
+stset timevar, failure(failvar)
+identifies single record survival time data. 
+timevar = time elapsed before event or end of observing period if event did not occur (censored).
+failvar = 1 if event occurred, 0 otherwise (censored)
+data must be stset before st* commands
+if we save data, stset definitions saved as well. 
+stset creates new variables named _st, _d, _t, _t0
+
+stset timevar, failure(failvar) id(patient) enter(time start)
+identifies multiple record survival time data
+timevar = time elapsed before event or censoring
+failvar = 1 if event occurred, 0 otherwise (censored)
+patient = id number
+start = time when each individual came under observation
+
+stdescribe
+describe survival time data
+
+stsum
+summary stats like total time at risk, incidence rate, number of subjects, percentiles of survival time
+
+ctset time nfail ncensor nenter, by(ethnic sex)
+identifies count-time data. 
+time = measure of time
+nfail = number of failures occuring at time
+ncensor = number of censored obs at time
+nenter = number entering at time
+ethnic and sex are categorical variables defining observations in these data
+
+cttost
+convert count-time data into survival-time form
+
+sts graph
+KM survivor function
+to compare two or more, use by(): sts graph, by(sex)
+to adjust for effects of continuous var: sts graph, by(sex) adjustfor(age)
+
+sts list
+list estimated KM function
+
+sts test sex
+test equality of KM function across sex
+
+sts generate survfunc = S
+creates a new variable called survfunc containing estimates KM function
+
+stcox x1 x2 x3
+fits a proportional hazards model, regressing time to failure on continuous or dummy variable predictors
+
+stphplot, by(sex)
+plots -ln(-ln(survival)) versus ln(analysis time)
+parallel curves support cox assumption that hazard ratio does not change with time
+see also: stcoxkm and estat phtest
+
+streg x1 x2, dist(weibull)
+fits weibull model regression
+
+streg x1 x2 x3 x4, dist(exponential) vce(robust)
+fits exponential-dist model regression
+
+stcurve, survival
+after streg, plots survival function from this model at mean values of all the x variables
+
+stcurve, cumhaz at (x3=50, x4=0)
+after streg, plots cumulative hazard function from this model at mean values of x1 and x2, x3 set at 50, and x4 set at 0
+
+poisson count x1 x2 x3, irr exposure(x4)
+poisson regression of event-count variable count
+independent-variable effects reported as incidence rate ratios
+exposure option identifies a variable indicating the amount of exposure if not the same for all obs
+NOTE: a poisson model assumes that event probability remains constant, regardless of how many times an event occurs for each observation. If prob does not remain constant, we should consider using nbreg (negative binomial regression) or gnbreg (generalized negative binomial regression)
+
+glm count x1 x2x x3, link(log) family(poisson) lnoffset(x4) eform
+performs the same regression specified in the previous example. 
 
 #################################################
 MULTILEVEL AND MIXED-EFFECTS MODELING
