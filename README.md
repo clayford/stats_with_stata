@@ -1,3 +1,3 @@
-# stats_with_stata
+# Statistics with Stata
 
-code and notes for Statistics with Stata (Hamilton)
+Code and notes for Statistics with Stata (Hamilton)
