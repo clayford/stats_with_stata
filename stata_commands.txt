@@ -1,0 +1,493 @@
+STATISTICS WITH STATA - version 10
+Hamilton
+
+#################################################
+DATA MANAGEMENT
+#################################################
+
+log using name_of_log
+start a log file that will record commands and results tables. Use "log close" at end of do file to close the log file.
+
+delimit ;
+set semicolon as end-of-line delimiter in do file. Stata will not consider a line finished until it encounters a semicolon. Allows you to not have to end every line break with ///. Turn off with #delimit cr. (This must end with a carriage return)
+
+append using olddata
+reads previously-saved dataset olddata.dta and adds all its observations to the data currently in memory
+save newdata, replace will save the combined datasets as newdata.dta
+
+browse
+opens data browser
+
+browse boats men if year > 1980
+opens data browser showing only boats and mean vars for years greater than 1980
+
+compress 
+converts all variables to their most efficient storage type
+
+drawnorm z1 z2 z3, n(5000)
+create a dataset with 5000 obs and three random vars sampled from std normal dist'n
+
+dropmiss
+drop from dataset any variables that have missing values for every obs.
+dropmiss, obs drops any observations with missing values for all obs
+
+edit
+open data editor
+
+edit boats year men
+open data editor with only variables boats year men visible
+
+encode stringvar, gen(numvar)
+create a new variable called numvar, with labeled numeric values based on the string (non-numeric) variable stringvar
+
+format rainfall %8.2f
+establish a fixed display format for numeric variable rainfall: 8 columns wide, with 2 digits always shown after decimal
+
+generate newvar = (x + y)/100
+create a new variable named newvar equal to (x + y)/100
+
+generate newvar = uniform()
+create a new variable wil values from uniform dist'n
+
+infile x y z using data.raw
+reads an ascii file named data.raw containting data on three vars: x, y  and z. 
+
+list
+lists data in "table" format, also list, display
+
+list x y z in 5/20
+list x y and z values for the 5th through 20th observations
+
+mvdecode var3-var62, mv(97=. \ 98=.a \ 99=.b)
+for variables var3 through var62, recode the numerical values 97, 98, and 99 as missing.
+If only one missing value is required, we can instead specify an option such as mv(97 98 99=.)
+
+replace oldvar = 100 * oldvar
+replaces values of oldvar with 100 times their previous values
+
+sample 10
+drops all obs in memory except for 10% random sample
+sample 55, count would drop all but a random sample of size n=55.
+
+save newfile
+saves data currently in memory as newfile.dta in working directory.
+save newfile, replace writes over previous version.
+
+sort x
+sorts data from lowest to highest values. Obs with missing data appear last after sorting because Stata views missing numbers as very large numbers. (see also gsort)
+
+tabulate x if y > 65
+frequency table for x using only those obs that have y values above 65.
+
+use oldfile
+retrieve previously-saved Stata-format dataset oldfile.dta.
+use oldfile, clear will open oldfile.dta and clear current dataset in memory without saving
+
+set more off
+turn off pausing in the results window. set more on turns it back on.
+
+describe using dataset.dta, short
+desribe dataset without loading into memory, good for large data sets.
+
+set memory 700m
+set memory limit to 700 MB; add ", permanently" to make it stick
+
+#################################################
+GRAPHS
+#################################################
+
+histogram y, frequency
+histogram of var y showing frequencies on vertical axis
+
+histogram y, start(0) width(10) norm fraction
+draw histogram of y with bins 10 units wide, starting at 0. Adds a normal curve based on the sample mean and SD, and shows fraction of data on the vertical axis
+
+histogram y, by(x, total) percent
+in one fig, draws separate histograms of y for each value of x, and also a total histogram for the sample as a whole. Shows percentages on the vertical axis.
+
+graph twoway scatter y x
+basic two variable scatter plot of y against x
+
+graph twoway lfit y x || scatter y x
+visualize the linear regression of y on x by overlaying two twoway graphs: the regression line and the y vs. x scatterplot; replace lfit with lfitci to include 95% confidence band
+
+graph twoway scatter y x, xlabel(0(10)100) ylabel(-3(1)6, horizontal)
+constructs scatterplot of y vs. x with s axis labeld at 0, 10, ... 100. y axis is labeled at -3, -2, ..., 6, with labels written horizontally instead of vertically (the default)
+
+graph twoway scatter y x, mlabel(country)
+constructs scatterplot of y vs. x with data points (markers) labeled by the values of variable country
+
+graph twoway scatter y x1, by(x2)
+in one figure, draws separate y vs. x1 scatterplots for each value of x2
+
+graph twoway scatter y x1 [fweight = population], msymbol(Oh)
+draws scatterplot of y vs. x1. Marker symbols are hollow circles (Oh), with their size (area) proportional to frequency-weight variable population.
+
+graph twoway connected y time
+a basic time plot of y against time. Data points are shown connected by line segments. To show line segments but no data-point markers use line instead of connected. (graph twoway line y time)
+
+graph twoway line y1 y2 time
+draws a tine plot with two y variables that both have the same scale, and are graphed against an x variable named time
+
+graph twoway line y1 time, yaxis(1) || line y2 time, yaxis(2)
+draws a time plot with two y variables that have different scales, by overlaying two individual time plots. The left-hand axis, yaxis(1), gives the scale for y1, while the right-hand y axis, yaxis(2), gives the scale for y2.
+
+graph matrix x1 x2 x3 x4 y
+constructs scatterplot matrix, showing all possible scatterplot pairs among the variables listed
+
+graph box y1 y2 y3
+constructs box plots of variables y1, y2, and y3
+
+graph box y, over(x) yline(23)
+constructs box plots of y for each value of x, and draws a horizontal line at y = 23
+
+graph bar (sum) a b c
+shows the sum of variables a, b and c as side-by-side bars in bar chart. To obtain means instead of sums, type graph bar (mean) a b c
+
+graph bar (mean) a, over(x)
+draws a bar chart showing the mean of variable a at each value of the variable x
+
+graph bar (asis) a b c, over(x) stack
+Draws a bar chart in which the values ("as is") of variables a, b and c are stacked on top of one another, at each value of variable x
+
+graph dot (median) y, over(x)
+draws a dot plot in which dots along a horizontal scale mark the median value of y at each level of x. graph dot supports the same statistical options as graph bar or collapse.
+
+qnorm y
+draws a quantile-normal plot (normal probability plot) showing quantiles of y versus corresponding quantiles of a Normal distribution.
+
+#################################################
+SUMMARY STATISTICS AND TABLES
+#################################################
+
+summarize y1 y2 y3
+calculates simple summary stats for vars listed
+
+summarize y1 y2 y3, detail
+get detailed summary stats, like percentiles, variance, etc.
+
+summarize y1 if x1 > 3 & x2 < .
+find summary stats for y1 using only those obs for which variable x1 is greater than 3 and not missing
+
+summarize y1 [fweight = w], detail
+get summary stats for y1 using the frequency weights in variable w
+
+tabstat y1, stats(mean sd skewness kurtosis n)
+calculates only the specified summary stats for var y1
+
+tabstat y1, stats(min p5 p25 p50 p75 p95 max) by (x1)
+calculates specified summary stats for y1, within categories of x1
+
+tabulate x1
+display frequency dist'n table for all nonmissing values of variable x1
+
+tabulate x1, sort miss
+display frequency dist'n of x1, including the missing values
+
+tab1 x1 x2 x3 x4
+displays a series of frequency tables, one for each of the variables listed
+
+tabulate x1 x2
+two-var cross tab with x1 as row var and x2 as the column
+
+tabulate x1 x2, chi2 nof column
+produces a cross tab and pearson chi-square test of independence. Does not show cell frequencies, but instead gives the column percentages in each cell
+
+tabulate x1 x2, missing row all
+cross tab that includes missing values. Calculates "all" available stats
+
+tab2 x1 x2 x3
+performs all possible two-way cross tabs of the listed variables
+
+tabulate x1, summ(y)
+produces a one-way table showing the mean, sd, and frequency of y values within each category of x1
+
+tabulate x1 x2, summ(y) means
+produces a two-way table showing the mean of y at each combination of x1 and x2 values
+
+by x3, sort: tabulate x1 x2, exact
+creates a three-way cross-tab with subtables for x1 (row) by x2 (column) at each value of x3. Calculates fisher's exact test for each subtable. by varname, sort: works as a prefix for almost any Stata command where it makes sense. The sort option is unnecessary if the data are already sorted on varname.
+
+table y x2 x3, by(x4 x5) contents(freq)
+creates a five-way cross-tab, of y(row by x2(column) by x3(supercolumn), by x4(superrow 1) by x5(superrow 2). Cells contain frequencies.
+
+table x1 x2, contents(mean y1 median y2)
+creates a two-way table of x1 (row) by x2 (column). Cells contain the mean of y1 and the median of y2.
+
+svy: tab y, percent ci
+using survey weights data, obtains a one-way table of percentages for var y, with 95% CI.
+
+svy: tab y x, column percent
+using survey-weights data, obtains a two-way cross-tab of row var y against column var x, with adjusted chi-square test of independence. Cells contain weighted column percentages.
+
+#################################################
+ANOVA AND OTHER COMPARISON METHODS
+#################################################
+
+anova y x1 x2
+two-way anova
+
+anova y x1 x2 x1#x2
+two-way factorial anova
+
+anova y x1 x2 x3 x1#x2 x1#x3 x2#x3 x1#x2#x3
+three-way factorial anova
+
+anova reading | curriculum / teacher|curriculum /
+fits a nested model to test the effects of three types of curriculum on students' reading ability. Teacher is nested within curriculum (teacher | curriculum) because several different teachers were assigned to each curriculum.
+
+anova headache subject medication, repeated(medication)
+fits a repeated-measures anova model to test the effects of three types of headache medication on the severity of subjects' headaches. The sample consists of 20 subjects who report suffering from frequent headaches. Each subject tried each of three medications at separate times during the study.
+
+anova y x1 x2 x3 x4 x2#x3 c.x3 c.x4 regress
+ancova with 4 IVs, two of them (x1 and x2) categorical and two (x3 and x4) measurements. Includes an interaction amd shows results in regression table.
+
+kwallis y, by(x)
+Kruskal-Wallis test of the null that y has identical rank distributions across the k categories of x (k > 2)
+
+oneway y x
+one-way anova; same analysis with different output: anova y x
+
+oneway y x, tabulate scheffe
+one-way anova including table of sample means and scheffe multiple-comparison test
+
+ranksum y, by(x)
+wilcoxon rank-sum test (aka mann-whitney U test) of null that y has identical rank distributions for both categories of dichotomous variable x. 
+
+serrbar ymeans se x, scale(2)
+construct SE bar plot from dataset of means. Variable ymeans holds the group means of y; se the standard errors; and x the values of catgorical variable x. scale(2) asks for bars extending to +/- 2 SEs.
+
+signrank y1 = y2
+wilcoxon matched-pairs signed-rank test for the equality of the rank distributions of y1 and y2. We could test whether the median of y1 differs from a constant such as 23.4 by typing the command signrank y1 = 23.4
+
+signtest y1 = y2
+tests the equality of the medians of y1 and y2. signtest y1 = 5 tests null that median of y1 = 5.
+
+ttest y = 5
+one-sample t test tof null that pop mean = 5
+
+ttest y1 = y2
+one-sample (paired differences) t test of the null that the pop mean of y1 equals that of y2. Default form of this command assumes that the data are paired. With unpaired data add the option unpaired.
+
+ttest y, by(x) unequal
+perford a two-sample t test of the null that the pop mean of y is the same for both categories of variable x. Does not assume that the populations have equal variances. (without the unequal option, ttest does assume equal variances)
+
+#################################################
+LINEAR REGRESSION ANALYSIS
+#################################################
+
+regress y x
+OLS regression
+
+regress y x if ethnic == 3 & income > 50 & income < .
+OLS regression on subset of data
+
+predict yhat
+generate new variable equal to the predicted values from the most recent regression
+
+predict e, resid
+generate a new variable equal to the residuals from the most recent regression
+
+graph twoway lfit y x || scatter y x
+Draws the simple regression line with a scatterplot of y vs. x
+
+graph twoway mspline yht x || scatter y x
+Draws the simple regression line with a scatterplot of y vs. x by connecting with a smooth cubic spline the regression's predicted values
+
+rvfplot
+draw residual versus fitted (predicted) values plot
+
+graph twoway scatter e yhat, yline(0)
+draw residual versus predicted values using the variables e and yhat
+
+regress y x1 x2 x3
+multiple regression
+
+regress y x1 x2 x3, vce(robust)
+calculates robust estimates of SE.
+
+regress y x1 x2 x3, beta
+multiple regression and includes standardized regression coefficients
+
+correlate x1 x2 x3 y
+display a matrix of pearson correlations, using on obs with no missing values on all variable specified
+
+pwcorr x1 x2 x3 y, sig star(.05)
+displays a matrix of pearson correlations using pairwise deletion of missing values and showing probabilities from t tests of null hypothesis that rho=0 for each correlation/
+
+graph matrix x1 x2 x3 y, half
+draws a scatter plot matrix.
+
+test x1 x2
+performs an F test of the null that coefficients x1 and x2 both equal 0
+
+xi: regress y x1 x2 i.catvar*x2
+performs "expanded interaction" regression of y on predictors x1, x2 a set of dummy variables created automatically to represent categories of catvar, and a set of interaction terms equal to those dummy vars times measurement variable x2.
+
+stepwise, pr(.05): regress y x1 x2 x3
+stepwise regression using backward elimination
+
+regress y x1 x2 x3 [aweight = w]
+performs weighted least squares (WLS) regression. variable w holds the analytical weights, which work as if we had multiplied each variable and the constant by the square root of w, and then performed an ordinary regression. Analytical weights are often employed to correct for heteroskedasticity when the y and x variables are means, rates, or proportions, and w is the number of individuals making up each aggregate obs in the data.
+
+regress y1 y2 x (x z)
+regress y2 y1 z (x z)
+estimates the reciprocal effects of y1 and y2, using instrumental variables x and z.
+
+#################################################
+REGRESSION DIAGNOSTICS
+#################################################
+
+The commands in this section assume you have just fit a model with anova or regress.
+
+# predict options
+predict new, cooksd
+generates new var equal to Cook's distance D, summarizing how much each observation influences the fitted model.
+
+predict new, covratop
+generates new var equal to COVRATIO statistic. COVRATIO measures the ith case's influence upon the variance-covariance matrix of the estimated coefficients.
+
+predict DFx1, dfbeta(x1)
+generates DFBETA case statistics measuring how much each obs affects the coefficient on predictor x1. To create a complete set of DFBETAs for all predictors in the model, type dfbeta without arguments
+
+predict new, dfits
+generates DFITS case statistics, summarizing the influence of each obs on the fitted model (similar in purpose to Cook's D and Welsch's S)
+
+# diagnostic tests
+
+estat hettest
+performs Cook and Weisberg's test for heteroskedasticity
+
+estat ovtest, rhs
+performs the Ramsey regression specification error test (RESET) for omitted variables
+
+estat vif
+calculates variance inflation factors to check for multicollinearity
+
+estat dwatson
+calculates the durbin-watson test for first-order autocorrelation in time series (tsset) data.
+
+# diagnostic plots
+acprplot x1, mspline msopts(bands(7))
+augmented partial residual plot
+
+avplot x1
+constructs an added-variable plot (also called a partial-regression or leverage plot) showing the relationship between y and x1, both adjusted for other x vars. Helps to notice outliers and influential points
+
+avplots
+draws and combines in one image all the added-variable plots from the recent anova or regress
+
+cprplot x1
+constructs a component-plus-residual plot (partial-residual plot) showing the adjusted relationship between y and the predictor x1. Helps detect nonlinearities in the data.
+
+lvr2plot
+constructs a leverage-versus-squared-residual plot (L-R plot)
+
+rvfplot
+graphs the residuals versus the fitted values of y
+
+rvpplot
+graphs the residuals against values of predictor x1
+
+#################################################
+FITTING CURVES
+#################################################
+three broad approaches to modeling nonlinear or curvlinear relationships
+- nonparametric: lowess smoothing and band regression 
+- linear regression with transformed vars (Box Cox)
+- nonlinear regression
+
+boxcox y x1 x2 x3, model(lhs)
+finds MLE of lambda for a box-cox transformation of y, assuming y is a linear function of x1, x2 and x3 and has constant-variance errors. model(lhs) restricts transformation to the left-hand-side var y.
+
+graph twoway mband y x, bands(10) || scatter y x
+produces y vs x scatter plot with line segments connecting the cross medians (median x, median y points) within 10 equal-width interval bands.  This is one form of band regression. Can use 'mspline' in place of 'mband'
+
+graph twoway lowess y x, bwidth(.4) || scatter y x
+draws a lowess smoothed curve with a scatterplot of y vs x. Lowess calculations use a bandwidth of .4 (40% of the data)
+
+lowess y x, bwidth(.3) gen(newvar)
+draws a lowess-smoothed curve on a scatter plot of y versus x, using a bandwidth of .3. Offers more options than graph twowy lowess
+
+nl (y1 = {b1=1}*{b2=1}^x
+uses iterative nonlinear least squares to fit a 2-parameter exponential growth model: b_1*b_2^x. b1 and b2 are bound in braces with their suggested starting values
+
+nl log4: y x, init(b0 5 b1 25 b2 .1 b3 50)
+fits a 4-parameter logistic growth model 
+
+regress lny x1 sqrtx2 invx3
+performs curvlinear regression 
+
+#################################################
+ROBUST REGRESSION
+#################################################
+If errors are normal iid, OLS is more efficient than any other unbiased estimator. If errors are not normal iid, then other unbiased estimators might outperform OLS. Robust regression methods aim to achieve almost the efficiency of OLS with ideal data and substantially better-than-OLS efficiency in non-ideal situations (ie, non-normal errors)
+
+rreg y x1 x2 x3
+performs robust regression of y on three predictors, using iteratively reweighted least square with Huber and biweight functions tuned for 95% Gaussian efficiency.
+
+rreg y x1 x2 x3, nolog tune(6) genwt(rweight) iterate(10)
+performs robust regression of y on three predictors. The options tell Stata not to print the iteration log, to use a tuning constant of 6 (which downweights outliers more steeply than the default of 7), to generate a new var (named rweight) holding the final-iteration robust weights for each observation, and to limit the max number of iterations to 10.
+
+qreg y x1 x2 x3
+performs quantile regression, aka least abs value (LAV) or minimum L1-norm regression of y on three predictors. By default, qreg models the conditional .5 quantile (approximate median) of y as a linear function of the predictor variables, and thus provides "median regression".
+
+qreg y x1 x2 x3, quantile(.25)
+performs quantile regression modelling the conditional; .25 quantile (first quantile) of y as a linear function of x1, x2 and x3
+
+bsqreg y x1 x2 x3, rep(100)
+performs quantile regression, with SEs estimated by bootstrap data resampling with 100 repetitions (default is rep(20))
+
+predict e, resid
+calculates residual values (arbitrarily named e) after any regress, rreg, qreg, or bsqreg commands. Similarly, predict yhat calculates the predicted values of y. 
+
+regress y x1 x2 x3, vce(robust)
+performs OLS regression of y on three predictors. The coefficient var-covar matrix, and hence SEs, are estimated by a robust method (Huber/White or sandwich) that does not assume identically distributed errors. 
+
+
+#################################################
+SURVIVAL AND EVENT-COUNT MODELS
+#################################################
+
+
+#################################################
+MULTILEVEL AND MIXED-EFFECTS MODELING
+#################################################
+
+xtmixed crime year || city: year
+mixed-effects regression of crime on year, with random intercept and slope for each value of city. Thus we obtain trends in crime rates, which are a combination of the overall trend (fixed effects), and variations of that trend (random effects) for each city
+
+xtmixed SAP parentcoll prepcourse || city: || school: grades
+Fits a hierarchical or multilevel mixed-effects model predicting student's SAT scores as a function of (1) fixed or whole-sample effects of whether the individual student's parents(s) graduated from college, and whether the student took a preparation course; (2) random intercepts representing the effect of the city in which they attend school; and (3) a random intercept and slope for the effect of individual students' grades, which could be different from one school to the next. Individual students (obs) are nested within schools, which are nested within cities. Note the order of the mixed-effects parts in the command.
+
+xtmixed y x1 x2 x3 || state: x4
+estimates store A
+xtmixed y x1 x2 x3 || state:
+estimates store B
+lrtest A B
+Conducts LRT of null of no difference in fit between the more complex model A (which includes a random slope on x4) and the simpler model B that does not include a random slope on x4. This amounts to a test of whether the random slope on x4 is statistically significant. Order of models in test does not matter.
+
+xtmixed y x1 x2 x3 || state: x4 x5, ml nocons cov(unstructured)
+performs mixed effects regression of y on x1, x2 and x3; also on random effects x 4a and x5 for each value of state. Obtains estimates by maximum likelihood. The model should have no random intercept, and an unstructured covariance matrix in which random-effect variances and covariances all are estimated distinctly.
+
+estat recov
+after xtmixed, displayes the estimated variance-covariance matrix of the random effects.
+
+predict re*, reffects
+after xtmixed estimation, obtains best linear unbiased predictions (BLUPs) of all random effects in the model. The random effects are stored as varaibles names re1, re2 and so forth, with appropriate variable labels.
+
+predict yhat, fitted
+after xtmixed estimation, obtains predicted values of y. To obtain predictions from the fixed effects portion of the model only, type predict yhat, xb. Other predict options find SEs of the fixed portion (stdp) and residuals (resid) or standardized residuals (rstan). 
+
+xtmelogit y x1 x2 || state:
+performs mixed-effect logit regression of {0,1} variable y on x1 and x2, with random intercepts for each level of state.
+
+predict phat
+after xtmelogit, obtains estimated probabilities from the complete (fixed plus random) model. 
+
+xtmepoisson accidents x1 x2 x3, exposure(persondays) || season: || port: , irr
+estimates mixed-effects poisson model for accidents, a count of accidents on fishing vessels. Fixed-effect predictors, characteristics of individual vessels, are x1 x2 and x3. Exposure is measured by the number of person-days at sea for that vessel. We include random inetrcepts for each season or year, and for port city nested within seasons. Report fixed-effect coefficients as incident rate ratios (irr).
+
+gllamm warming sex race educ age class, i(region) family(binomial) link(ologit) adapt
+perfoms generalized linear latent and mixed modeling - in this example a mixed-effects ordered logit regression of ordinal variable warming, opinion about global warming, on fixed-effect predictors sex, race, educ, age, and class. Includes random intercepts for each value of region. Estimation by adaptive quadrature. The family() and link() options can specify other models including mulinomial logit, probit, ordered probit and complementary log-log. gllamm is not an official program supplied with Stata (as of version 10)
+
